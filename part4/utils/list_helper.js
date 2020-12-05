@@ -51,8 +51,6 @@ const mostLikes = (blogs) => {
     return blog
   }, new Map())
 
-  console.log(mapping)
-
   const authorLikes = !_.isEmpty(mapping)
     ? [...mapping.entries()].reduce((a, e) => (e[1] > a[1] ? e : a))
     : {}

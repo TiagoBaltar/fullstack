@@ -1,47 +1,50 @@
 const blogRouter = require('express').Router()
+const { response } = require('express')
 const Blog = require('../models/blog')
 
-blogRouter.get('/', (req, res) => {
-  Blog.find({}) //
-    .then((blogs) => res.json(blogs))
+blogRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({})
+  res.json(blogs)
 })
 
-blogRouter.get('/:id', (req, res, next) => {
-  Blog.findbyId(req.params.id)
-    .then((blog) => {
-      if (blog) {
-        res.json(blog)
-      } else {
-        res.status(400).end()
-      }
-    })
-    .catch((error) => next(error))
+blogRouter.get('/:id', async (req, res) => {
+  const blog = await Blog.findById(req.params.id)
+  if (blog) {
+    res.json(blog)
+  } else {
+    res.status(404).end()
+  }
 })
 
-blogRouter.post('/', (req, res, next) => {
+blogRouter.post('/', async (req, res) => {
   const body = req.body
+
+  if (!body.title) {
+    return res.status(400).end()
+  }
+
+  if (!body.url) {
+    return res.status(400).end()
+  }
 
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes,
+    likes: body.likes || 0,
     date: new Date(),
   })
 
-  blog
-    .save() //
-    .then((savedBlog) => res.json(savedBlog))
-    .catch((error) => next(error))
+  const savedBlog = await blog.save()
+  res.json(savedBlog)
 })
 
-blogRouter.delete('/:id', (req, res, next) => {
-  Blog.findByIdAndRemove(req.params.id) //
-    .then(() => res.status(204).end())
-    .catch((error) => next(error))
+blogRouter.delete('/:id', async (req, res) => {
+  await Blog.findByIdAndRemove(req.params.id) //
+  res.status(204).end()
 })
 
-blogRouter.put('/:id', (req, res, next) => {
+blogRouter.put('/:id', async (req, res) => {
   const body = req.body
 
   const blog = {
@@ -51,12 +54,12 @@ blogRouter.put('/:id', (req, res, next) => {
     likes: body.likes,
   }
 
-  Blog.findByIdAndUpdate(req.params.id, blog, {
+  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, {
     new: true,
     runValidators: true,
-  }) //
-    .then((updatedBlog) => res.json(updatedBlog))
-    .catch((error) => next(error))
+  })
+
+  res.json(updatedBlog)
 })
 
 module.exports = blogRouter

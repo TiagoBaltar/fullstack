@@ -152,7 +152,7 @@ describe('most likes', () => {
     expect(mostLikes(listWithOneBlog)).toEqual(res)
   })
 
-  test.only('of a list of blogs is fecthed correctly', () => {
+  test('of a list of blogs is fecthed correctly', () => {
     const res = {
       author: 'Edsger W. Dijkstra',
       likes: 17,
