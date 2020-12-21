@@ -1,3 +1,5 @@
+let timerId = 0
+
 const notificationReducer = (state = '', action) => {
   switch (action.type) {
     case 'SET_NOTIFICATION':
@@ -18,7 +20,8 @@ export const setNotification = (notification, timer) => {
       data: { notification },
     })
 
-    setTimeout(() => dispatch(clearNotification), timer * 1000)
+    clearTimeout(timerId)
+    timerId = setTimeout(() => dispatch(clearNotification), timer * 1000)
   }
 }
 
